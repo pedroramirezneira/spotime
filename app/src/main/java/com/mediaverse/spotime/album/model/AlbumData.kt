@@ -1,10 +1,10 @@
 package com.mediaverse.spotime.album.model
 
-import com.mediaverse.spotime.model.ImageData
 import com.mediaverse.spotime.artists.model.SimplifiedArtistData
+import com.mediaverse.spotime.model.ImageData
 
 @Suppress("PropertyName")
-data class Album(
+data class AlbumData(
     val album_type: String,
     val total_tracks: Int,
     val available_markets: List<String>,

@@ -1,11 +1,11 @@
 package com.mediaverse.spotime.tracks.model
 
-import com.mediaverse.spotime.album.model.Album
+import com.mediaverse.spotime.album.model.AlbumData
 import com.mediaverse.spotime.artists.model.SimplifiedArtistData
 
 @Suppress("PropertyName")
 data class TrackData(
-    val album: Album,
+    val album: AlbumData,
     val artists: List<SimplifiedArtistData>,
     val available_markets: List<String>,
     val disc_number: Int,
