@@ -1,6 +1,4 @@
-package com.mediaverse.spotime.artists.model
-
-import com.mediaverse.spotime.model.ImageData
+package com.mediaverse.spotime.model
 
 data class ArtistData(
     val genres: List<String>,

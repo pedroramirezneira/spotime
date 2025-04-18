@@ -1,8 +1,8 @@
-package com.mediaverse.spotime.album.config
+package com.mediaverse.spotime.config
 
-import com.mediaverse.spotime.album.model.AlbumData
-import com.mediaverse.spotime.artists.model.SimplifiedArtistData
+import com.mediaverse.spotime.model.AlbumData
 import com.mediaverse.spotime.model.ImageData
+import com.mediaverse.spotime.model.SimplifiedArtistData
 
 val albumsMock =
     listOf(

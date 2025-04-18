@@ -1,7 +1,4 @@
-package com.mediaverse.spotime.album.model
-
-import com.mediaverse.spotime.artists.model.SimplifiedArtistData
-import com.mediaverse.spotime.model.ImageData
+package com.mediaverse.spotime.model
 
 @Suppress("PropertyName")
 data class AlbumData(

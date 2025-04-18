@@ -1,4 +1,4 @@
-package com.mediaverse.spotime.artists.model
+package com.mediaverse.spotime.model
 
 data class SimplifiedArtistData(
     val id: String,
