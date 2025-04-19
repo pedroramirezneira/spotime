@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.mediaverse.spotime",
+      "sha256_cert_fingerprints": [
+        "2B:89:62:CD:8C:A9:80:05:2B:32:79:30:D8:1D:FD:E4:0B:DE:0F:80:64:6D:1D:67:8F:CB:0B:50:D0:84:32:12"
+      ]
+    }
+  }
+]

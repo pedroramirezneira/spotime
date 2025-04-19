@@ -50,8 +50,6 @@ class SpotifyViewModel @Inject constructor(
             Constants.REDIRECT_URI.toUri()
         )
             .setCodeVerifier(codeVerifier)
-//            .setCodeChallenge(codeChallenge)
-//            .setCodeChallengeMethod("S256")
             .setScope(Constants.SCOPES)
             .build()
 
@@ -63,7 +61,7 @@ class SpotifyViewModel @Inject constructor(
         val ex = AuthorizationException.fromIntent(intent)
 
         if (response != null) {
-            val tokenRequest = response.createTokenExchangeRequest(mapOf("code_verifier" to codeVerifier))
+            val tokenRequest = response.createTokenExchangeRequest()
             authService.performTokenRequest(tokenRequest) { tokenResponse, _ ->
                 tokenResponse?.accessToken?.let {
                     tokenManager.saveToken(it)
