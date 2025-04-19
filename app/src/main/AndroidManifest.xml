@@ -30,8 +30,8 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:host="pedroramirezneira.github.io/spotime"
-                    android:path="/callback"
+                    android:host="pedroramirezneira.github.io"
+                    android:path="/spotime/callback"
                     android:scheme="https" />
             </intent-filter>
         </activity>
