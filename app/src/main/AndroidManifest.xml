@@ -31,7 +31,7 @@
 
                 <data
                     android:host="pedroramirezneira.github.io"
-                    android:path="/spotime/callback"
+                    android:pathPrefix="/spotime/callback"
                     android:scheme="https" />
             </intent-filter>
         </activity>
