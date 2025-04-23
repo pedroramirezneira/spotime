@@ -10,12 +10,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.mediaverse.spotime.authentication.Constants
+import com.mediaverse.spotime.ui.screens.SpotifyViewModel
 
 @Composable
-fun SpotifyLoginScreen(
+fun LoginScreen(
     viewModel: SpotifyViewModel,
-    redirectIntent: Intent?,
+    redirectIntent: Intent?, // lo recibís en MainActivity
     clearIntent: () -> Unit
 ) {
     val context = LocalContext.current
@@ -26,7 +26,7 @@ fun SpotifyLoginScreen(
 
     LaunchedEffect(redirectIntent) {
         redirectIntent?.data?.let { data ->
-            if (data.toString().startsWith(Constants.REDIRECT_URI)) {
+            if (data.toString().startsWith("yourapp://callback")) {
                 viewModel.handleAuthResponse(redirectIntent)
                 clearIntent()
             }

@@ -1,7 +1,4 @@
-package com.mediaverse.spotime.tracks.model
-
-import com.mediaverse.spotime.model.AlbumData
-import com.mediaverse.spotime.model.SimplifiedArtistData
+package com.mediaverse.spotime.model
 
 @Suppress("PropertyName")
 data class TrackData(
