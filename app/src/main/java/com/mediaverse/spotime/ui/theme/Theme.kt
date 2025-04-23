@@ -13,13 +13,21 @@ import androidx.compose.ui.platform.LocalContext
 private val DarkColorScheme = darkColorScheme(
     primary = Primary,
     secondary = Secondary,
-    tertiary = Tertiary
+    tertiary = Tertiary,
+    onPrimary = OnPrimaryDark,
+    error = Error,
+    surface = SurfaceDark,
+    onSurface = OnSurfaceDark
 )
 
 private val LightColorScheme = lightColorScheme(
     primary = Primary,
     secondary = Secondary,
-    tertiary = Tertiary
+    tertiary = Tertiary,
+    onPrimary = OnPrimaryLight,
+    error = Error,
+    surface = SurfaceLight,
+    onSurface = OnSurfaceLight
 
     /* Other default colors to override
     background = Color(0xFFFFFBFE),
@@ -36,7 +44,7 @@ private val LightColorScheme = lightColorScheme(
 fun SpotiMeTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {

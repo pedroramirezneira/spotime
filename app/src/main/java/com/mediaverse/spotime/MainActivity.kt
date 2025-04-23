@@ -48,7 +48,7 @@ class MainActivity : FragmentActivity() {
                 }
             }
 
-            SpotiMeTheme(dynamicColor = false) {
+            SpotiMeTheme {
                 when {
                     isLoading -> {
                         Box(
