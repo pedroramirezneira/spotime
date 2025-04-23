@@ -1,5 +1,7 @@
 package com.mediaverse.spotime.ui.navigation
 
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -19,7 +21,13 @@ fun Navigation(
     NavHost(
         navController = navController,
         startDestination = Screens.Home.name,
-        modifier = modifier
+        modifier = modifier,
+        enterTransition = {
+            EnterTransition.None
+        },
+        exitTransition = {
+            ExitTransition.None
+        },
     ) {
         composable(Screens.Home.name) {
             HomeScreen()
