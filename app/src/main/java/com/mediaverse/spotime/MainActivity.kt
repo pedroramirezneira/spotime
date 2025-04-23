@@ -7,6 +7,7 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -14,9 +15,12 @@ import androidx.compose.ui.Modifier
 import androidx.fragment.app.FragmentActivity
 import androidx.navigation.compose.rememberNavController
 import com.mediaverse.spotime.authentication.Constants
+import com.mediaverse.spotime.ui.components.AppBar
+import com.mediaverse.spotime.ui.navigation.BottomBar
 import com.mediaverse.spotime.ui.screens.LoginScreen
 import com.mediaverse.spotime.ui.screens.SpotifyViewModel
 import com.mediaverse.spotime.ui.navigation.Navigation
+import com.mediaverse.spotime.ui.navigation.Screens
 import com.mediaverse.spotime.ui.theme.SpotiMeTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -34,9 +38,7 @@ class MainActivity : FragmentActivity() {
 
         setContent {
             val isLoggedIn by spotifyViewModel.isLoggedIn.collectAsState()
-            val userName by spotifyViewModel.userName.collectAsState()
             val isLoading by spotifyViewModel.isLoading.collectAsState()
-
             val navController = rememberNavController()
 
             LaunchedEffect(redirectIntent) {
@@ -57,7 +59,7 @@ class MainActivity : FragmentActivity() {
                         }
                     }
 
-                    !isLoggedIn || userName == null -> {
+                    !isLoggedIn -> {
                         LoginScreen(
                             viewModel = spotifyViewModel,
                             redirectIntent = redirectIntent,
@@ -69,22 +71,10 @@ class MainActivity : FragmentActivity() {
                         Scaffold(
                             modifier = Modifier.fillMaxSize(),
                             topBar = {
-                                TopAppBar(title = { Text("Welcome $userName") })
+                                AppBar(navController)
                             },
                             bottomBar = {
-                                NavigationBar {
-                                    NavigationBarItem(
-                                        selected = true,
-                                        onClick = { /* TODO */ },
-                                        icon = {
-                                            Icon(
-                                                Icons.Default.Home,
-                                                contentDescription = null
-                                            )
-                                        },
-                                        label = { Text("Home") }
-                                    )
-                                }
+                                BottomBar { navController.navigate(it) }
                             }
                         ) { innerPadding ->
                             Navigation(innerPadding, navController)

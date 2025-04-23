@@ -8,6 +8,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.mediaverse.spotime.ui.screens.HomeScreen
+import com.mediaverse.spotime.ui.screens.TracksScreen
 
 @Composable
 fun Navigation(
@@ -22,6 +23,9 @@ fun Navigation(
     ) {
         composable(Screens.Home.name) {
             HomeScreen()
+        }
+        composable(Screens.Tracks.name) {
+            TracksScreen()
         }
     }
 }

@@ -14,6 +14,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import com.mediaverse.spotime.R
 import com.mediaverse.spotime.authentication.Constants
+import com.mediaverse.spotime.ui.theme.ButtonPadding
 import com.mediaverse.spotime.ui.theme.WelcomeGap
 import com.mediaverse.spotime.ui.theme.WelcomeWidth
 
@@ -66,8 +67,12 @@ fun LoginScreen(
                     launcher.launch(authIntent)
                 },
                 modifier = Modifier.width(WelcomeWidth)
+                    .padding(ButtonPadding)
             ) {
-                Text("Login with Spotify")
+                Text(
+                    "Login with Spotify",
+                    style = MaterialTheme.typography.titleMedium
+                )
             }
 
             Spacer(modifier = Modifier.height(WelcomeGap))
