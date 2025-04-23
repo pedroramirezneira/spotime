@@ -7,3 +7,5 @@ val CardSpacing = 8.dp
 const val MovieCardAspectRatio = 2/3.toDouble()
 val MovieCardWidth = 128.dp
 val ViewPadding = 24.dp
+val WelcomeWidth = 280.dp
+val WelcomeGap = 24.dp

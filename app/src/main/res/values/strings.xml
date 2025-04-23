@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">SpotiMe!</string>
+    <string name="welcome_text">Welcome!\nPlease log in with your Spotify account to continue.</string>
 </resources>

@@ -14,7 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.fragment.app.FragmentActivity
 import androidx.navigation.compose.rememberNavController
 import com.mediaverse.spotime.authentication.Constants
-import com.mediaverse.spotime.screens.LoginScreen
+import com.mediaverse.spotime.ui.screens.LoginScreen
 import com.mediaverse.spotime.ui.screens.SpotifyViewModel
 import com.mediaverse.spotime.ui.navigation.Navigation
 import com.mediaverse.spotime.ui.theme.SpotiMeTheme
@@ -46,7 +46,7 @@ class MainActivity : FragmentActivity() {
                 }
             }
 
-            SpotiMeTheme {
+            SpotiMeTheme(dynamicColor = false) {
                 when {
                     isLoading -> {
                         Box(
