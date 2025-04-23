@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.mediaverse.spotime.ui.screens.ArtistsScreen
 import com.mediaverse.spotime.ui.screens.HomeScreen
 import com.mediaverse.spotime.ui.screens.TracksScreen
 
@@ -20,7 +21,7 @@ fun Navigation(
     val modifier = Modifier.padding(innerPadding)
     NavHost(
         navController = navController,
-        startDestination = Screens.Home.name,
+        startDestination = Screens.Artists.name,
         modifier = modifier,
         enterTransition = {
             EnterTransition.None
@@ -29,8 +30,8 @@ fun Navigation(
             ExitTransition.None
         },
     ) {
-        composable(Screens.Home.name) {
-            HomeScreen()
+        composable(Screens.Artists.name) {
+            ArtistsScreen()
         }
         composable(Screens.Tracks.name) {
             TracksScreen()

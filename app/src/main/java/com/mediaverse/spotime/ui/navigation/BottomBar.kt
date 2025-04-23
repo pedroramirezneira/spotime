@@ -1,8 +1,8 @@
 package com.mediaverse.spotime.ui.navigation
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.rounded.Person
+import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -19,26 +19,28 @@ fun BottomBar(onNavigate: (String) -> Unit) {
         NavigationBarItem(
             selected = navIndex.intValue == 0,
             onClick = {
-                onNavigate(Screens.Home.name)
+                if (navIndex.intValue == 0) return@NavigationBarItem
+                onNavigate(Screens.Artists.name)
                 navIndex.intValue = 0
             },
             icon = {
                 Icon(
-                    Icons.Default.Home,
+                    Icons.Rounded.Person,
                     contentDescription = null
                 )
             },
-            label = { Text("Home") }
+            label = { Text("Artists") }
         )
         NavigationBarItem(
             selected = navIndex.intValue == 1,
             onClick = {
+                if (navIndex.intValue == 1) return@NavigationBarItem
                 onNavigate(Screens.Tracks.name)
                 navIndex.intValue = 1
             },
             icon = {
                 Icon(
-                    Icons.Default.PlayArrow,
+                    Icons.Rounded.PlayArrow,
                     contentDescription = null
                 )
             },

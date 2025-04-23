@@ -13,7 +13,7 @@ import com.mediaverse.spotime.ui.navigation.Screens
 fun AppBar(navController: NavController) {
     val route = navController.currentBackStackEntryAsState().value?.destination?.route
     val title = when (route) {
-        Screens.Home.name -> "Home"
+        Screens.Artists.name -> "Your Artists"
         Screens.Tracks.name -> "Your Tracks"
         else -> "SpotiMe!"
     }
