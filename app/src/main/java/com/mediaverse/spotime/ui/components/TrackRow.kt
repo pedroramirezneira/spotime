@@ -29,11 +29,6 @@ fun TrackRow(index: Int, track: TrackData) {
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
                 .data(imageUrl)
-                .listener(
-                    onStart = { },
-                    onSuccess = { _, _ -> println("Image loaded successfully") },
-                    onError = { _, result -> println(result) }
-                )
                 .build(),
             contentDescription = track.name,
             modifier = Modifier

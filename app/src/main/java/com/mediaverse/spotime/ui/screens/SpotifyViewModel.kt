@@ -54,16 +54,12 @@ class SpotifyViewModel @Inject constructor(
     }
 
     fun handleAuthResponse(intent: Intent) {
-        println("🚀 handleAuthResponse triggered with: ${intent.data}")
         _isLoading.value = true
 
         val uri = intent.data
         val code = uri?.getQueryParameter("code")
-        val state = uri?.getQueryParameter("state")
 
         if (code != null) {
-            println("✅ Código de autorización recibido: $code")
-
             val serviceConfig = AuthorizationServiceConfiguration(
                 Constants.AUTHORIZATION_ENDPOINT.toUri(),
                 Constants.TOKEN_ENDPOINT.toUri()
@@ -71,7 +67,6 @@ class SpotifyViewModel @Inject constructor(
 
             val verifier = tokenManager.getCodeVerifier()
             if (verifier == null) {
-                println("❌ Code verifier is missing")
                 _isLoading.value = false
                 return
             }
@@ -88,23 +83,15 @@ class SpotifyViewModel @Inject constructor(
 
             authService.performTokenRequest(tokenRequest) { tokenResponse, exception ->
                 _isLoading.value = false
-                if (tokenResponse != null) {
-                    tokenResponse.accessToken?.let {
-                        println("✅ Token recibido: $it")
-                        tokenManager.saveToken(it)
-                        tokenManager.clearCodeVerifier()
-                        _isLoggedIn.value = true
-                        fetchUser()
-                    } ?: run {
-                        println("❌ Token vacío en la respuesta")
-                    }
-                } else {
-                    println("❌ Token request failed: ${exception?.message}")
+                tokenResponse?.accessToken?.let {
+                    tokenManager.saveToken(it)
+                    tokenManager.clearCodeVerifier()
+                    _isLoggedIn.value = true
+                    fetchUser()
                 }
             }
 
         } else {
-            println("❌ Código de autorización no encontrado en la URL")
             _isLoading.value = false
         }
     }

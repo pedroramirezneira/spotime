@@ -23,16 +23,12 @@ class TracksViewModel
         val isLoading = _isLoading.asStateFlow()
 
         fun fetchTopTracks() {
-            println("Fetching top tracks")
             viewModelScope.launch {
                 _isLoading.value = true
                 val response = spotifyApi.getTopTracks(limit = 50)
                 if (response.isSuccessful) {
-                    println("Tracks fetched successfully")
                     _tracks.value = response.body()?.items ?: emptyList()
                 }
-                println(response.code())
-                println(response.body())
                 _isLoading.value = false
             }
         }

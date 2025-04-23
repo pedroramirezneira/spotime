@@ -29,7 +29,6 @@ fun LoginScreen(
     LaunchedEffect(redirectIntent) {
         redirectIntent?.data?.let { uri ->
             if (uri.toString().startsWith(Constants.REDIRECT_URI)) {
-                println("🎯 Processing Spotify redirect URI")
                 viewModel.handleAuthResponse(redirectIntent)
                 clearIntent()
             }
@@ -70,7 +69,7 @@ fun LoginScreen(
                     .padding(ButtonPadding)
             ) {
                 Text(
-                    "Login with Spotify",
+                    stringResource(R.string.login_with_spotify),
                     style = MaterialTheme.typography.titleMedium
                 )
             }
