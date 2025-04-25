@@ -1,6 +1,8 @@
 package com.mediaverse.spotime.ui.screens
 
+import android.net.Uri
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.CircularProgressIndicator
@@ -9,14 +11,16 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import com.google.gson.Gson
 import com.mediaverse.spotime.ui.components.TrackRow
+import com.mediaverse.spotime.ui.navigation.Screens
 import com.mediaverse.spotime.ui.theme.BottomBarHeight
-import com.mediaverse.spotime.ui.theme.ViewPadding
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Suppress("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun TracksScreen() {
+fun TracksScreen(navController: NavController) {
     val viewModel: TracksViewModel = hiltViewModel()
     val tracks by viewModel.tracks.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
@@ -27,7 +31,9 @@ fun TracksScreen() {
 
     if (isLoading) {
         Box(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = BottomBarHeight),
             contentAlignment = Alignment.Center
         ) {
             CircularProgressIndicator()
@@ -35,11 +41,14 @@ fun TracksScreen() {
     } else {
             LazyColumn(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = ViewPadding)
+                    .fillMaxSize(),
             ) {
                 itemsIndexed(tracks) { index, track ->
-                    TrackRow(index = index, track = track)
+                    TrackRow(index = index, track = track) {
+                        val trackJson = Gson().toJson(track)
+                        val encoded = Uri.encode(trackJson)
+                        navController.navigate(Screens.TrackDetails.withArgs(encoded))
+                    }
                 }
                 item {
                     Spacer(Modifier.height(BottomBarHeight))

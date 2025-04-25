@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.mediaverse.spotime.R
 import com.mediaverse.spotime.authentication.Constants
 import com.mediaverse.spotime.ui.theme.ButtonPadding
@@ -20,11 +21,11 @@ import com.mediaverse.spotime.ui.theme.WelcomeWidth
 
 @Composable
 fun LoginScreen(
-    viewModel: SpotifyViewModel,
     redirectIntent: Intent?,
     clearIntent: () -> Unit,
 ) {
     val launcher = rememberLauncherForActivityResult(StartActivityForResult()) {}
+    val viewModel: SpotifyViewModel = hiltViewModel()
 
     LaunchedEffect(redirectIntent) {
         redirectIntent?.data?.let { uri ->

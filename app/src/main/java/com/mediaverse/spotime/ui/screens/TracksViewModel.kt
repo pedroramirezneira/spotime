@@ -18,7 +18,6 @@ class TracksViewModel
     ) : ViewModel() {
         private val _tracks = MutableStateFlow<List<TrackData>>(emptyList())
         val tracks = _tracks.asStateFlow()
-
         private val _isLoading = MutableStateFlow(true)
         val isLoading = _isLoading.asStateFlow()
 

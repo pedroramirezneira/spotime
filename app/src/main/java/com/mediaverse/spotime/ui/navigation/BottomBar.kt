@@ -17,14 +17,15 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.mediaverse.spotime.ui.theme.BottomBarHeight
+import com.mediaverse.spotime.ui.theme.ViewPadding
 
 @Composable
 fun BottomBar(onNavigate: (String) -> Unit) {
     val navIndex = remember { mutableIntStateOf(0) }
 
     val items = listOf(
-        BottomBarItemData("Artists", Icons.Rounded.Person, Screens.Artists.name),
-        BottomBarItemData("Tracks", Icons.Rounded.PlayArrow, Screens.Tracks.name)
+        BottomBarItemData("Artists", Icons.Rounded.Person, Screens.Artists.route),
+        BottomBarItemData("Tracks", Icons.Rounded.PlayArrow, Screens.Tracks.route)
     )
 
     Box(
@@ -33,10 +34,9 @@ fun BottomBar(onNavigate: (String) -> Unit) {
             .height(BottomBarHeight)
             .background(
                 Brush.verticalGradient(
-                    colorStops = arrayOf(
-                        0.0f to Color.Transparent,
-                        0.5f to Color.Black,
-                        1.0f to Color.Black
+                    colors = listOf(
+                        Color.Transparent,
+                        Color.Black,
                     )
                 )
             ),
@@ -44,7 +44,8 @@ fun BottomBar(onNavigate: (String) -> Unit) {
     ) {
         Row(
             modifier = Modifier
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .padding(horizontal = ViewPadding),
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
