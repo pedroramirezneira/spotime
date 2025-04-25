@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -24,7 +25,7 @@ fun ArtistRow(index: Int, artist: ArtistData) {
             style = MaterialTheme.typography.bodyLarge
         )
         AsyncImage(
-            model = artist.images.firstOrNull()?.url,
+            model = remember { artist.images.firstOrNull()?.url },
             contentDescription = artist.name,
             modifier = Modifier
                 .size(50.dp)

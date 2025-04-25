@@ -1,20 +1,17 @@
 package com.mediaverse.spotime.ui.screens
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.mediaverse.spotime.ui.components.TrackRow
+import com.mediaverse.spotime.ui.theme.BottomBarHeight
+import com.mediaverse.spotime.ui.theme.ViewPadding
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Suppress("UnusedMaterial3ScaffoldPaddingParameter")
@@ -24,7 +21,6 @@ fun TracksScreen() {
     val tracks by viewModel.tracks.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
 
-    // Fetch top tracks when this screen is first launched
     LaunchedEffect(Unit) {
         viewModel.fetchTopTracks()
     }
@@ -40,10 +36,13 @@ fun TracksScreen() {
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 16.dp, vertical = 24.dp)
+                    .padding(horizontal = ViewPadding)
             ) {
                 itemsIndexed(tracks) { index, track ->
                     TrackRow(index = index, track = track)
+                }
+                item {
+                    Spacer(Modifier.height(BottomBarHeight))
                 }
             }
         }

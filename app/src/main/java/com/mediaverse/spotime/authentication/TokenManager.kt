@@ -16,7 +16,6 @@ class TokenManager
         private val prefs: SharedPreferences =
             context.getSharedPreferences("auth_prefs", Context.MODE_PRIVATE)
 
-        // In-memory access token (not persisted)
         private var accessToken: String? = null
 
         fun saveToken(token: String) {

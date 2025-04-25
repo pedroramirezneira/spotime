@@ -10,3 +10,4 @@ val ViewPadding = 24.dp
 val WelcomeWidth = 280.dp
 val WelcomeGap = 24.dp
 val ButtonPadding = 8.dp
+val BottomBarHeight = 96.dp
