@@ -1,4 +1,4 @@
-package com.mediaverse.spotime.ui.screens
+package com.mediaverse.spotime.ui.screens.login
 
 import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult

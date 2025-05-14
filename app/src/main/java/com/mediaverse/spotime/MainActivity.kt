@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -12,11 +11,12 @@ import androidx.compose.ui.Modifier
 import androidx.fragment.app.FragmentActivity
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
+import com.google.firebase.FirebaseApp
 import com.mediaverse.spotime.authentication.Constants
 import com.mediaverse.spotime.ui.components.AppBar
 import com.mediaverse.spotime.ui.navigation.BottomBar
-import com.mediaverse.spotime.ui.screens.LoginScreen
-import com.mediaverse.spotime.ui.screens.SpotifyViewModel
+import com.mediaverse.spotime.ui.screens.login.LoginScreen
+import com.mediaverse.spotime.ui.screens.login.SpotifyViewModel
 import com.mediaverse.spotime.ui.navigation.Navigation
 import com.mediaverse.spotime.ui.screens.LoadingScreen
 import com.mediaverse.spotime.ui.theme.SpotiMeTheme
@@ -29,6 +29,7 @@ class MainActivity : FragmentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        FirebaseApp.initializeApp(this)
         enableEdgeToEdge()
         if (intent?.data?.toString()?.startsWith(Constants.REDIRECT_URI) == true) {
             redirectIntent = intent

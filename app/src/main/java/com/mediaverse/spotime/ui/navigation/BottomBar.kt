@@ -25,7 +25,8 @@ fun BottomBar(onNavigate: (String) -> Unit) {
 
     val items = listOf(
         BottomBarItemData("Artists", Icons.Rounded.Person, Screens.Artists.route),
-        BottomBarItemData("Tracks", Icons.Rounded.PlayArrow, Screens.Tracks.route)
+        BottomBarItemData("Tracks", Icons.Rounded.PlayArrow, Screens.Tracks.route),
+        BottomBarItemData("User", Icons.Rounded.Person, Screens.User.route)
     )
 
     Box(

@@ -7,6 +7,7 @@ enum class Screens(
     ArtistDetails("artist_details"),
     Tracks("tracks"),
     TrackDetails("track_details"),
+    User("user"),
     ;
 
     fun withArgs(vararg args: String): String =

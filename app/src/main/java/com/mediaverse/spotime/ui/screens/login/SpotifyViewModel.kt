@@ -1,4 +1,4 @@
-package com.mediaverse.spotime.ui.screens
+package com.mediaverse.spotime.ui.screens.login
 
 import android.app.Application
 import android.content.Intent

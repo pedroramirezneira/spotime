@@ -3,12 +3,14 @@ accompanistNavigationAnimation = "0.37.2"
 accompanistSharedElement = "<latest_version>"
 coil3Network = "3.0.0"
 coilCompose = "3.0.0"
+credentials = "1.5.0"
+firebaseBom = "33.13.0"
+googleid = "1.1.1"
 hiltNavigationCompose = "1.2.0"
-kotlin = "1.9.23"
+kotlin = "2.0.0"
 agp = "8.9.2"
 hilt = "2.49"
 composeBom = "2025.04.01"
-composeCompiler = "1.5.11"
 coreKtx = "1.16.0"
 lifecycleRuntimeKtx = "2.8.7"
 activityCompose = "1.10.1"
@@ -26,6 +28,8 @@ spotless = "7.0.3"
 accompanist-navigation-animation = { module = "com.google.accompanist:accompanist-navigation-animation", version.ref = "accompanistNavigationAnimation" }
 accompanist-shared-element = { module = "com.google.accompanist:accompanist-shared-element", version.ref = "accompanistSharedElement" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-credentials = { module = "androidx.credentials:credentials", version.ref = "credentials" }
+androidx-credentials-play-services-auth = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "credentials" }
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
@@ -41,6 +45,9 @@ androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-man
 appauth = { group = "net.openid", name = "appauth", version.ref = "appauth" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilCompose" }
 coil3-network = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coil3Network" }
+firebase-auth-ktx = { module = "com.google.firebase:firebase-auth-ktx" }
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
+googleid = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "googleid" }
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
 retrofit-converter-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit" }
@@ -56,3 +63,4 @@ kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 com-diffplug-spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
+androidx-compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

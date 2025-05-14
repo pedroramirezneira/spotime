@@ -1,4 +1,4 @@
-package com.mediaverse.spotime.ui.screens
+package com.mediaverse.spotime.ui.screens.tracks
 
 import android.content.Intent
 import androidx.compose.foundation.layout.*

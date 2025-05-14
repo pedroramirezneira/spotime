@@ -1,9 +1,10 @@
 package com.mediaverse.spotime.ui.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.ExperimentalSharedTransitionApi
-import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
@@ -22,11 +23,13 @@ import androidx.navigation.navArgument
 import com.google.gson.Gson
 import com.mediaverse.spotime.model.ArtistData
 import com.mediaverse.spotime.model.TrackData
-import com.mediaverse.spotime.ui.screens.ArtistDetailsScreen
-import com.mediaverse.spotime.ui.screens.ArtistsScreen
-import com.mediaverse.spotime.ui.screens.TrackDetailsScreen
-import com.mediaverse.spotime.ui.screens.TracksScreen
+import com.mediaverse.spotime.ui.screens.artists.ArtistDetailsScreen
+import com.mediaverse.spotime.ui.screens.artists.ArtistsScreen
+import com.mediaverse.spotime.ui.screens.tracks.TrackDetailsScreen
+import com.mediaverse.spotime.ui.screens.tracks.TracksScreen
+import com.mediaverse.spotime.ui.screens.user.User
 
+@RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun Navigation(
@@ -76,6 +79,10 @@ fun Navigation(
             val artistJson = backStackEntry.arguments?.getString("artistJson") ?: ""
             val artist = Gson().fromJson(artistJson, ArtistData::class.java)
             ArtistDetailsScreen(artist)
+        }
+
+        composable(Screens.User.route) {
+            User()
         }
     }
 }

@@ -1,8 +1,7 @@
-package com.mediaverse.spotime.ui.screens
+package com.mediaverse.spotime.ui.screens.tracks
 
 import android.net.Uri
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.CircularProgressIndicator

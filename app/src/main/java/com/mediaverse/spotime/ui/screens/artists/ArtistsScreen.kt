@@ -1,4 +1,4 @@
-package com.mediaverse.spotime.ui.screens
+package com.mediaverse.spotime.ui.screens.artists
 
 import android.net.Uri
 import androidx.compose.foundation.layout.*
@@ -14,7 +14,6 @@ import com.google.gson.Gson
 import com.mediaverse.spotime.ui.components.ArtistRow
 import com.mediaverse.spotime.ui.navigation.Screens
 import com.mediaverse.spotime.ui.theme.BottomBarHeight
-import com.mediaverse.spotime.ui.theme.ViewPadding
 
 @Composable
 fun ArtistsScreen(navController: NavController) {
