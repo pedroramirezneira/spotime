@@ -55,7 +55,6 @@ class BiometricAuthManager
                         BiometricManager.Authenticators.BIOMETRIC_STRONG
                             or BiometricManager.Authenticators.DEVICE_CREDENTIAL,
                     ).setTitle("Biometric Authentication")
-                    .setSubtitle("Log in using your biometric credentials")
                     .build()
 
             biometricPrompt.authenticate(promptInfo)
