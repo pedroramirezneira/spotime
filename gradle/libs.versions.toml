@@ -1,6 +1,7 @@
 [versions]
 accompanistNavigationAnimation = "0.37.2"
 accompanistSharedElement = "<latest_version>"
+biometric = "1.2.0-alpha05"
 coil3Network = "3.0.0"
 coilCompose = "3.0.0"
 credentials = "1.5.0"
@@ -27,6 +28,7 @@ spotless = "7.0.3"
 [libraries]
 accompanist-navigation-animation = { module = "com.google.accompanist:accompanist-navigation-animation", version.ref = "accompanistNavigationAnimation" }
 accompanist-shared-element = { module = "com.google.accompanist:accompanist-shared-element", version.ref = "accompanistSharedElement" }
+androidx-biometric = { module = "androidx.biometric:biometric", version.ref = "biometric" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-credentials = { module = "androidx.credentials:credentials", version.ref = "credentials" }
 androidx-credentials-play-services-auth = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "credentials" }
