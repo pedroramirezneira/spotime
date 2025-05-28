@@ -37,29 +37,28 @@ class MainActivity : FragmentActivity() {
         super.onCreate(savedInstanceState)
         FirebaseApp.initializeApp(this)
         enableEdgeToEdge()
+
         if (intent?.data?.toString()?.startsWith(Constants.REDIRECT_URI) == true) {
             redirectIntent = intent
         }
 
-        // Compose state to control UI after biometric success
-        var isAuthenticated by mutableStateOf(false)
-
-        biometricAuthManager.authenticate(
-            context = this,
-            onError = {
-                finish() // Close app or show alternative screen
-            },
-            onFail = {
-                finish() // Optionally show retry screen
-            },
-            onSuccess = {
-                isAuthenticated = true
-            }
-        )
+        val shouldAuthenticate = intent?.data == null
 
         setContent {
+            var isAuthenticated by remember { mutableStateOf(!shouldAuthenticate) }
+
+            LaunchedEffect(Unit) {
+                if (shouldAuthenticate) {
+                    biometricAuthManager.authenticate(
+                        context = this@MainActivity,
+                        onError = { finish() },
+                        onFail = { finish() },
+                        onSuccess = { isAuthenticated = true }
+                    )
+                }
+            }
+
             if (!isAuthenticated) {
-                // Optional loading screen while waiting for auth
                 SpotiMeTheme { LoadingScreen() }
                 return@setContent
             }
@@ -78,30 +77,17 @@ class MainActivity : FragmentActivity() {
 
             SpotiMeTheme {
                 when {
-                    isLoading -> {
-                        LoadingScreen()
-                    }
-
-                    !isLoggedIn -> {
-                        LoginScreen(
-                            redirectIntent = redirectIntent,
-                            clearIntent = { redirectIntent = null }
-                        )
-                    }
-
-                    else -> {
-                        Scaffold(
-                            modifier = Modifier
-                                .fillMaxSize(),
-                            topBar = {
-                                AppBar(navController)
-                            },
-                            bottomBar = {
-                                BottomBar { navController.navigate(it) }
-                            },
-                        ) { innerPadding ->
-                            Navigation(innerPadding, navController)
-                        }
+                    isLoading -> LoadingScreen()
+                    !isLoggedIn -> LoginScreen(
+                        redirectIntent = redirectIntent,
+                        clearIntent = { redirectIntent = null }
+                    )
+                    else -> Scaffold(
+                        modifier = Modifier.fillMaxSize(),
+                        topBar = { AppBar(navController) },
+                        bottomBar = { BottomBar { navController.navigate(it) } }
+                    ) { innerPadding ->
+                        Navigation(innerPadding, navController)
                     }
                 }
             }
