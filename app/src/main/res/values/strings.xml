@@ -3,4 +3,8 @@
     <string name="welcome_text">Welcome!\nPlease log in with your Spotify account to continue.</string>
     <string name="login_with_spotify">Login with Spotify</string>
     <string name="listen_on_spotify">Listen on Spotify</string>
+    <string name="sign_out">Sign out</string>
+    <string name="clear_history">Clear history</string>
+    <string name="empty_tracks_history">You have not listened to any songs yet. Head to the tracks section and listen to a song to view it here!</string>
+    <string name="tracks_history">Listened tracks history</string>
 </resources>

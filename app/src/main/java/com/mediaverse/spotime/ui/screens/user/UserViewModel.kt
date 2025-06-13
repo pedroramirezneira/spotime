@@ -18,7 +18,10 @@ import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential.Companion.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
+import com.mediaverse.spotime.api.SpotifyApi
 import com.mediaverse.spotime.authentication.Constants
+import com.mediaverse.spotime.data.HistoryDataStore
+import com.mediaverse.spotime.model.TrackData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,12 +37,47 @@ class UserViewModel
     @Inject
     constructor(
         @ApplicationContext val context: Context,
+        private val spotifyApi: SpotifyApi,
+        private val historyDataStore: HistoryDataStore,
     ) : ViewModel() {
         private val auth: FirebaseAuth = FirebaseAuth.getInstance()
         private val credentialManager = CredentialManager.create(context)
 
         private val _userData = MutableStateFlow(auth.currentUser)
         val userData = _userData.asStateFlow()
+
+        private val _historyTracks = MutableStateFlow<List<TrackData>>(emptyList())
+        val historyTracks = _historyTracks.asStateFlow()
+
+        private val _firebaseReady = MutableStateFlow(false)
+        val firebaseReady = _firebaseReady.asStateFlow()
+
+        init {
+            fetchListenedTracks()
+            viewModelScope.launch {
+                val current = auth.currentUser
+                _userData.emit(current)
+                _firebaseReady.emit(true)
+            }
+        }
+
+        private fun fetchListenedTracks() {
+            viewModelScope.launch {
+                historyDataStore.listenedTrackIds.collect { ids ->
+                    val tracks =
+                        ids.mapNotNull { id ->
+                            try {
+                                val response = spotifyApi.getTrackById(id)
+                                Log.d("xoaco", response.toString())
+                                if (response.isSuccessful) response.body() else null
+                            } catch (e: Exception) {
+                                null
+                            }
+                        }
+                    _historyTracks.emit(tracks)
+                }
+            }
+        }
 
         fun launchCredentialManager() {
             // Instantiate a Google sign-in request
@@ -126,6 +164,13 @@ class UserViewModel
                 } catch (e: ClearCredentialException) {
                     Log.e(TAG, "Couldn't clear user credentials: ${e.localizedMessage}")
                 }
+            }
+        }
+
+        fun clearHistory() {
+            viewModelScope.launch {
+                historyDataStore.clearHistory()
+                _historyTracks.emit(emptyList()) // Clear the UI as well
             }
         }
     }

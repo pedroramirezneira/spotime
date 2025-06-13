@@ -2,93 +2,108 @@ package com.mediaverse.spotime.ui.screens.user
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.mediaverse.spotime.R
+import com.mediaverse.spotime.ui.components.TrackRow
+import com.mediaverse.spotime.ui.theme.*
 
 @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 @Composable
 fun User() {
-    Text("Here I store my user data")
     val viewModel = hiltViewModel<UserViewModel>()
     val userData = viewModel.userData.collectAsStateWithLifecycle()
+    val historyTracks = viewModel.historyTracks.collectAsStateWithLifecycle()
+    val firebaseReady = viewModel.firebaseReady.collectAsStateWithLifecycle()
 
-    if (userData.value == null) {
-        GoogleLoginButton(
-            modifier = Modifier,
-            onClick = viewModel::launchCredentialManager
-        )
-    } else {
-        Column {
-            AsyncImage(
-                model = userData.value?.photoUrl,
-                contentDescription = "",
-                modifier = Modifier.size(40.dp),
-            )
-            Text(
-                userData.value?.displayName ?: ""
-            )
-            Text(
-                userData.value?.email ?: ""
-            )
-
-            Button(onClick = { viewModel.signOut() }) {
-                Text("Sign out")
-            }
+    LaunchedEffect(firebaseReady.value, userData.value) {
+        if (firebaseReady.value && userData.value == null) {
+            viewModel.launchCredentialManager()
         }
     }
-}
 
-@Composable
-private fun GoogleLoginButton(
-    onClick: () -> Unit,
-    modifier: Modifier
-) {
-    GoogleButtonUI(
-        modifier = modifier,
-        onClick = onClick,
-    )
-}
+    if (!firebaseReady.value || userData.value == null) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = BottomBarHeight),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
+        }
+        return
+    }
 
-@Composable
-private fun GoogleButtonUI(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Button(
-        modifier = modifier,
-        onClick = onClick,
-        colors = ButtonDefaults.buttonColors(
-            containerColor = Color.White,
-            contentColor = Color.Black
-        ),
-        shape = RoundedCornerShape(12.dp),
-        border = BorderStroke(1.dp, Color.LightGray),
-        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 16.dp)
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(ViewPadding)
     ) {
-        Image(
-            modifier = Modifier.size(24.dp),
-            painter = painterResource(R.drawable.isologo),
-            contentDescription = null
+        AsyncImage(
+            model = userData.value?.photoUrl,
+            contentDescription = null,
+            modifier = Modifier.size(ImageSize)
         )
-        Spacer(modifier = Modifier.width(8.dp))
-        Text("Continue with Google")
+        Spacer(Modifier.height(RowGap))
+        Text(
+            userData.value?.displayName ?: "",
+            style = MaterialTheme.typography.titleMedium
+        )
+        Text(
+            userData.value?.email ?: "",
+            style = MaterialTheme.typography.bodyMedium
+        )
+
+        Spacer(modifier = Modifier.height(ColumnGap))
+
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(RowGap),
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Button(
+                modifier = Modifier.weight(1f),
+                onClick = { viewModel.signOut() }
+            ) {
+                Text(stringResource(R.string.sign_out))
+            }
+
+            Button(
+                modifier = Modifier.weight(1f),
+                onClick = { viewModel.clearHistory() }
+            ) {
+                Text(stringResource(R.string.clear_history))
+            }
+        }
+
+        Spacer(modifier = Modifier.height(ColumnGap))
+
+        Text(stringResource(R.string.tracks_history), style = MaterialTheme.typography.titleSmall)
+        Spacer(modifier = Modifier.height(RowGap))
+
+        if (historyTracks.value.isEmpty()) {
+            Text(
+                stringResource(R.string.empty_tracks_history),
+                style = MaterialTheme.typography.bodyMedium
+            )
+        } else {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(bottom = BottomBarHeight),
+                verticalArrangement = Arrangement.spacedBy(ListPadding)
+            ) {
+                historyTracks.value.forEachIndexed { index, track ->
+                    TrackRow(index = index, track = track, onClick = { /* Navigation */ })
+                }
+            }
+        }
     }
 }
