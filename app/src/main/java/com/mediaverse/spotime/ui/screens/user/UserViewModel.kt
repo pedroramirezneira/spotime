@@ -1,23 +1,22 @@
 package com.mediaverse.spotime.ui.screens.user
 
 import android.content.Context
+import android.content.Intent
+import android.credentials.GetCredentialException
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.credentials.ClearCredentialStateRequest
-import androidx.credentials.Credential
-import androidx.credentials.CredentialManager
-import androidx.credentials.CustomCredential
-import androidx.credentials.GetCredentialRequest
+import androidx.credentials.*
 import androidx.credentials.exceptions.ClearCredentialException
-import androidx.credentials.exceptions.GetCredentialException
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential.Companion.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.GoogleAuthProvider
 import com.mediaverse.spotime.api.SpotifyApi
 import com.mediaverse.spotime.authentication.Constants
 import com.mediaverse.spotime.data.getListenedTrackIds
@@ -35,161 +34,175 @@ const val TAG = "UserViewModel"
 
 @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 @HiltViewModel
-class UserViewModel
-    @Inject
-    constructor(
-        @ApplicationContext private val context: Context,
-        private val spotifyApi: SpotifyApi,
-    ) : ViewModel() {
-        private val auth: FirebaseAuth = FirebaseAuth.getInstance()
-        private val credentialManager = CredentialManager.create(context)
+class UserViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
+    private val spotifyApi: SpotifyApi,
+) : ViewModel() {
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+    private val credentialManager = CredentialManager.create(context)
 
-        private val _userData = MutableStateFlow(auth.currentUser)
-        val userData = _userData.asStateFlow()
+    private val _userData = MutableStateFlow(auth.currentUser)
+    val userData = _userData.asStateFlow()
 
-        private val _historyTracks = MutableStateFlow<List<TrackData>>(emptyList())
-        val historyTracks = _historyTracks.asStateFlow()
+    private val _historyTracks = MutableStateFlow<List<TrackData>>(emptyList())
+    val historyTracks = _historyTracks.asStateFlow()
 
-        private val _firebaseReady = MutableStateFlow(false)
-        val firebaseReady = _firebaseReady.asStateFlow()
+    private val _firebaseReady = MutableStateFlow(false)
+    val firebaseReady = _firebaseReady.asStateFlow()
 
-        init {
-            viewModelScope.launch {
-                val current = auth.currentUser
-                _userData.emit(current)
-                _firebaseReady.emit(true)
-            }
+    private val _isLoadingTracks = MutableStateFlow(false)
+    val isLoadingTracks = _isLoadingTracks.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            val current = auth.currentUser
+            _userData.emit(current)
+            _firebaseReady.emit(true)
         }
+    }
 
-        private val _isLoadingTracks = MutableStateFlow(false)
-        val isLoadingTracks = _isLoadingTracks.asStateFlow()
+    fun fetchListenedTracks() {
+        viewModelScope.launch {
+            getListenedTrackIds(context).collect { ids ->
+                _isLoadingTracks.emit(true)
 
-        fun fetchListenedTracks() {
-            viewModelScope.launch {
-                getListenedTrackIds(context).collect { ids ->
-                    _isLoadingTracks.emit(true)
-
-                    val distinctIds = ids.distinct()
-
-                    val tracks =
-                        distinctIds
-                            .map { id ->
-                                async {
-                                    try {
-                                        val response = spotifyApi.getTrackById(id)
-                                        if (response.isSuccessful) response.body()?.let { id to it } else null
-                                    } catch (_: Exception) {
-                                        null
-                                    }
-                                }
-                            }.awaitAll()
-                            .filterNotNull()
-                            .toMap()
-
-                    val orderedTracks = ids.mapNotNull { tracks[it] }
-
-                    _historyTracks.emit(orderedTracks)
-                    _isLoadingTracks.emit(false)
-                }
-            }
-        }
-
-        fun launchCredentialManager(activityContext: Context) {
-            // Instantiate a Google sign-in request
-            Log.d(TAG, "Launching Credential Manager...") // ✅ Add this
-            val googleIdOption =
-                GetGoogleIdOption
-                    .Builder()
-                    // Your server's client ID, not your Android client ID.
-                    .setServerClientId((Constants.GOOGLE_SERVER_ID))
-                    // Only show accounts previously used to sign in.
-                    .setFilterByAuthorizedAccounts(false)
-                    .build()
-
-            // Create the Credential Manager request
-            val request =
-                GetCredentialRequest
-                    .Builder()
-                    .addCredentialOption(googleIdOption)
-                    .build()
-
-            viewModelScope.launch {
-                try {
-                    // Launch Credential Manager UI
-                    Log.d(TAG, "Calling credentialManager.getCredential") // ✅ Add this
-                    val result =
-                        credentialManager.getCredential(
-                            context = activityContext,
-                            request = request,
-                        )
-
-                    // Extract credential from the result returned by Credential Manager
-                    Log.d(TAG, "Credential received: ${result.credential.data}") // ✅ Add this
-                    handleSignIn(result.credential)
-                } catch (e: GetCredentialException) {
-                    Log.e(TAG, "Couldn't retrieve user's credentials: ${e.localizedMessage}")
-                }
-            }
-        }
-
-        private fun handleSignIn(credential: Credential) {
-            // Check if credential is of type Google ID
-            if (credential is CustomCredential && credential.type == TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
-                // Create Google ID Token
-                val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
-
-                // Sign in to Firebase with using the token
-                firebaseAuthWithGoogle(googleIdTokenCredential.idToken)
-            } else {
-                Log.w(TAG, "Credential is not of type Google ID!")
-            }
-        }
-
-        private fun firebaseAuthWithGoogle(idToken: String) {
-            val credential = GoogleAuthProvider.getCredential(idToken, null)
-            auth
-                .signInWithCredential(credential)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        // Sign in success, update UI with the signed-in user's information
-                        Log.d(TAG, "signInWithCredential:success")
-                        val user = auth.currentUser
-                        viewModelScope.launch {
-                            _userData.emit(user)
+                val distinctIds = ids.distinct()
+                val tracks = distinctIds.map { id ->
+                    async {
+                        try {
+                            val response = spotifyApi.getTrackById(id)
+                            if (response.isSuccessful) response.body()?.let { id to it } else null
+                        } catch (_: Exception) {
+                            null
                         }
-                    } else {
-                        // If sign in fails, display a message to the user
-                        viewModelScope.launch {
-                            _userData.emit(null)
-                        }
-                        Log.w(TAG, "signInWithCredential:failure", task.exception)
                     }
-                }
-        }
+                }.awaitAll().filterNotNull().toMap()
 
-        fun signOut() {
-            // Firebase sign out
-            auth.signOut()
+                val orderedTracks = ids.mapNotNull { tracks[it] }
 
-            // When a user signs out, clear the current user credential state from all credential providers.
-            viewModelScope.launch {
-                try {
-                    val clearRequest = ClearCredentialStateRequest()
-                    credentialManager.clearCredentialState(clearRequest)
-                    viewModelScope.launch {
-                        _userData.emit(null)
-                    }
-                } catch (e: ClearCredentialException) {
-                    Log.e(TAG, "Couldn't clear user credentials: ${e.localizedMessage}")
-                }
-            }
-        }
-
-        fun clearHistory() {
-            viewModelScope.launch {
-                com.mediaverse.spotime.data
-                    .clearHistory(context)
-                _historyTracks.emit(emptyList())
+                _historyTracks.emit(orderedTracks)
+                _isLoadingTracks.emit(false)
             }
         }
     }
+
+    fun launchCredentialManager(activityContext: Context) {
+        if (Build.MANUFACTURER.equals("Samsung", ignoreCase = true)) {
+            Log.w(TAG, "Samsung device detected – using legacy Google Sign-In")
+            launchLegacyGoogleSignIn(activityContext)
+            return
+        }
+
+        Log.d(TAG, "Launching Credential Manager...")
+
+        val googleIdOption = GetGoogleIdOption.Builder()
+            .setServerClientId(Constants.GOOGLE_SERVER_ID)
+            .setFilterByAuthorizedAccounts(false)
+            .build()
+
+        val request = GetCredentialRequest.Builder()
+            .addCredentialOption(googleIdOption)
+            .build()
+
+        viewModelScope.launch {
+            try {
+                Log.d(TAG, "Calling credentialManager.getCredential...")
+                val result = credentialManager.getCredential(
+                    context = activityContext,
+                    request = request,
+                )
+
+                Log.d(TAG, "Credential received: ${result.credential.data}")
+                handleSignIn(result.credential)
+            } catch (e: GetCredentialException) {
+                Log.e(TAG, "CredentialManager failed: ${e.localizedMessage}")
+                Log.w(TAG, "Falling back to legacy Google Sign-In...")
+                launchLegacyGoogleSignIn(activityContext)
+            }
+        }
+    }
+
+    private fun launchLegacyGoogleSignIn(context: Context) {
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(Constants.GOOGLE_SERVER_ID)
+            .requestEmail()
+            .build()
+
+        val signInClient = GoogleSignIn.getClient(context, gso)
+        val signInIntent = signInClient.signInIntent
+        // 👇 IMPORTANTE: este intent debe ser lanzado desde la Activity, no desde ViewModel
+        signInIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        context.startActivity(signInIntent)
+    }
+
+    fun handleGoogleSignInIntent(data: Intent?) {
+        try {
+            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
+            val account = task.result
+            val idToken = account?.idToken
+            if (!idToken.isNullOrEmpty()) {
+                firebaseAuthWithGoogle(idToken)
+            } else {
+                Log.w(TAG, "Google ID Token is null or empty")
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Google Sign-In failed: ${e.localizedMessage}")
+        }
+    }
+
+    private fun handleSignIn(credential: Credential) {
+        if (credential is CustomCredential && credential.type == TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
+            val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
+            firebaseAuthWithGoogle(googleIdTokenCredential.idToken)
+        } else {
+            Log.w(TAG, "Credential is not of type Google ID!")
+        }
+    }
+
+    private fun firebaseAuthWithGoogle(idToken: String) {
+        val credential = GoogleAuthProvider.getCredential(idToken, null)
+        auth.signInWithCredential(credential)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Log.d(TAG, "signInWithCredential:success")
+                    val user = auth.currentUser
+                    viewModelScope.launch {
+                        _userData.emit(user)
+                    }
+                } else {
+                    viewModelScope.launch {
+                        _userData.emit(null)
+                    }
+                    Log.w(TAG, "signInWithCredential:failure", task.exception)
+                }
+            }
+    }
+
+    fun signOut() {
+        auth.signOut()
+        viewModelScope.launch {
+            try {
+                val clearRequest = ClearCredentialStateRequest()
+                credentialManager.clearCredentialState(clearRequest)
+                _userData.emit(null)
+            } catch (e: ClearCredentialException) {
+                Log.e(TAG, "Couldn't clear user credentials: ${e.localizedMessage}")
+            }
+        }
+    }
+
+    fun clearHistory() {
+        viewModelScope.launch {
+            com.mediaverse.spotime.data.clearHistory(context)
+            _historyTracks.emit(emptyList())
+        }
+    }
+
+    fun getLegacyGoogleSignInIntent(context: Context): Intent {
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(Constants.GOOGLE_SERVER_ID)
+            .requestEmail()
+            .build()
+        return GoogleSignIn.getClient(context, gso).signInIntent
+    }
+}

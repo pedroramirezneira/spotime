@@ -2,6 +2,8 @@ package com.mediaverse.spotime.ui.screens.user
 
 import android.net.Uri
 import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -28,25 +30,38 @@ import com.mediaverse.spotime.ui.theme.*
 @Composable
 fun User(navController: NavController) {
     val viewModel = hiltViewModel<UserViewModel>()
-    val userData = viewModel.userData.collectAsStateWithLifecycle()
-    val historyTracks = viewModel.historyTracks.collectAsStateWithLifecycle()
-    val firebaseReady = viewModel.firebaseReady.collectAsStateWithLifecycle()
-    val isLoadingHistory = viewModel.isLoadingTracks.collectAsStateWithLifecycle()
+    val userData by viewModel.userData.collectAsStateWithLifecycle()
+    val historyTracks by viewModel.historyTracks.collectAsStateWithLifecycle()
+    val firebaseReady by viewModel.firebaseReady.collectAsStateWithLifecycle()
+    val isLoadingHistory by viewModel.isLoadingTracks.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
-    LaunchedEffect(viewModel.historyTracks) {
-        if (viewModel.historyTracks.value.isEmpty()) {
+    val googleSignInLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            viewModel.handleGoogleSignInIntent(result.data)
+        }
+
+    LaunchedEffect(Unit) {
+        if (historyTracks.isEmpty()) {
             viewModel.fetchListenedTracks()
         }
     }
 
-    LaunchedEffect(firebaseReady.value, userData.value) {
-        if (firebaseReady.value && userData.value == null) {
-            viewModel.launchCredentialManager(context)
+    LaunchedEffect(firebaseReady, userData) {
+        if (firebaseReady && userData == null) {
+            val manufacturer = Build.MANUFACTURER.lowercase()
+            if (manufacturer == "samsung") {
+                // Dispositivo Samsung – usar flujo legacy
+                val legacyIntent = viewModel.getLegacyGoogleSignInIntent(context)
+                googleSignInLauncher.launch(legacyIntent)
+            } else {
+                // Dispositivos compatibles con Credential Manager
+                viewModel.launchCredentialManager(context)
+            }
         }
     }
 
-    if (!firebaseReady.value || userData.value == null) {
+    if (!firebaseReady || userData == null) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -59,26 +74,24 @@ fun User(navController: NavController) {
     }
 
     LazyColumn(
-        modifier = Modifier
-            .fillMaxSize(),
+        modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(ListPadding)
     ) {
         item {
             Column(modifier = Modifier.padding(horizontal = ViewPadding)) {
                 AsyncImage(
-                    model = userData.value?.photoUrl,
+                    model = userData?.photoUrl,
                     contentDescription = null,
                     modifier = Modifier.size(ImageSize).clip(RoundedCornerShape(BorderRadius))
-
                 )
                 Spacer(Modifier.height(RowGap))
 
                 Text(
-                    userData.value?.displayName ?: "",
+                    userData?.displayName ?: "",
                     style = MaterialTheme.typography.titleMedium
                 )
                 Text(
-                    userData.value?.email ?: "",
+                    userData?.email ?: "",
                     style = MaterialTheme.typography.bodyMedium
                 )
 
@@ -87,7 +100,7 @@ fun User(navController: NavController) {
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(RowGap),
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     Button(
                         modifier = Modifier.weight(1f),
@@ -111,11 +124,10 @@ fun User(navController: NavController) {
         }
 
         when {
-            isLoadingHistory.value -> {
+            isLoadingHistory -> {
                 item {
                     Box(
-                        modifier = Modifier
-                            .fillParentMaxWidth(),
+                        modifier = Modifier.fillParentMaxWidth(),
                         contentAlignment = Alignment.Center
                     ) {
                         CircularProgressIndicator()
@@ -123,7 +135,7 @@ fun User(navController: NavController) {
                 }
             }
 
-            historyTracks.value.isEmpty() -> {
+            historyTracks.isEmpty() -> {
                 item {
                     Text(
                         stringResource(R.string.empty_tracks_history),
@@ -134,7 +146,7 @@ fun User(navController: NavController) {
             }
 
             else -> {
-                itemsIndexed(historyTracks.value.asReversed()) { index, track ->
+                itemsIndexed(historyTracks.asReversed()) { index, track ->
                     TrackRow(index = index, track = track, onClick = {
                         val trackJson = Gson().toJson(track)
                         val encoded = Uri.encode(trackJson)
