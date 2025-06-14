@@ -15,6 +15,7 @@ import com.google.gson.Gson
 import com.mediaverse.spotime.ui.components.TrackRow
 import com.mediaverse.spotime.ui.navigation.Screens
 import com.mediaverse.spotime.ui.theme.BottomBarHeight
+import com.mediaverse.spotime.ui.theme.ViewPadding
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Suppress("UnusedMaterial3ScaffoldPaddingParameter")

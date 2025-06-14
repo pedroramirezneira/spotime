@@ -44,50 +44,51 @@ fun User() {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(ViewPadding)
+            .padding(vertical = ViewPadding)
     ) {
-        AsyncImage(
-            model = userData.value?.photoUrl,
-            contentDescription = null,
-            modifier = Modifier.size(ImageSize)
-        )
-        Spacer(Modifier.height(RowGap))
-        Text(
-            userData.value?.displayName ?: "",
-            style = MaterialTheme.typography.titleMedium
-        )
-        Text(
-            userData.value?.email ?: "",
-            style = MaterialTheme.typography.bodyMedium
-        )
+        Column(modifier = Modifier.padding(horizontal = ViewPadding)) {
+            AsyncImage(
+                model = userData.value?.photoUrl,
+                contentDescription = null,
+                modifier = Modifier.size(ImageSize)
+            )
+            Spacer(Modifier.height(RowGap))
+            Text(
+                userData.value?.displayName ?: "",
+                style = MaterialTheme.typography.titleMedium
+            )
+            Text(
+                userData.value?.email ?: "",
+                style = MaterialTheme.typography.bodyMedium
+            )
 
-        Spacer(modifier = Modifier.height(ColumnGap))
+            Spacer(modifier = Modifier.height(ColumnGap))
 
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(RowGap),
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            Button(
-                modifier = Modifier.weight(1f),
-                onClick = { viewModel.signOut() }
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(RowGap),
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth(),
             ) {
-                Text(stringResource(R.string.sign_out))
+                Button(
+                    modifier = Modifier.weight(1f),
+                    onClick = { viewModel.signOut() }
+                ) {
+                    Text(stringResource(R.string.sign_out))
+                }
+
+                Button(
+                    modifier = Modifier.weight(1f),
+                    onClick = { viewModel.clearHistory() }
+                ) {
+                    Text(stringResource(R.string.clear_history))
+                }
             }
 
-            Button(
-                modifier = Modifier.weight(1f),
-                onClick = { viewModel.clearHistory() }
-            ) {
-                Text(stringResource(R.string.clear_history))
-            }
+            Spacer(modifier = Modifier.height(ColumnGap))
+
+            Text(stringResource(R.string.tracks_history), style = MaterialTheme.typography.titleSmall)
+            Spacer(modifier = Modifier.height(RowGap))
         }
-
-        Spacer(modifier = Modifier.height(ColumnGap))
-
-        Text(stringResource(R.string.tracks_history), style = MaterialTheme.typography.titleSmall)
-        Spacer(modifier = Modifier.height(RowGap))
-
         if (historyTracks.value.isEmpty()) {
             Text(
                 stringResource(R.string.empty_tracks_history),
