@@ -94,8 +94,9 @@ class UserViewModel
             }
         }
 
-        fun launchCredentialManager() {
+        fun launchCredentialManager(activityContext: Context) {
             // Instantiate a Google sign-in request
+            Log.d(TAG, "Launching Credential Manager...") // ✅ Add this
             val googleIdOption =
                 GetGoogleIdOption
                     .Builder()
@@ -115,13 +116,15 @@ class UserViewModel
             viewModelScope.launch {
                 try {
                     // Launch Credential Manager UI
+                    Log.d(TAG, "Calling credentialManager.getCredential") // ✅ Add this
                     val result =
                         credentialManager.getCredential(
-                            context = context,
+                            context = activityContext,
                             request = request,
                         )
 
                     // Extract credential from the result returned by Credential Manager
+                    Log.d(TAG, "Credential received: ${result.credential.data}") // ✅ Add this
                     handleSignIn(result.credential)
                 } catch (e: GetCredentialException) {
                     Log.e(TAG, "Couldn't retrieve user's credentials: ${e.localizedMessage}")

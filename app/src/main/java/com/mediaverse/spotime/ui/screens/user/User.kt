@@ -12,6 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -31,6 +32,7 @@ fun User(navController: NavController) {
     val historyTracks = viewModel.historyTracks.collectAsStateWithLifecycle()
     val firebaseReady = viewModel.firebaseReady.collectAsStateWithLifecycle()
     val isLoadingHistory = viewModel.isLoadingTracks.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
     LaunchedEffect(viewModel.historyTracks) {
         if (viewModel.historyTracks.value.isEmpty()) {
@@ -40,7 +42,7 @@ fun User(navController: NavController) {
 
     LaunchedEffect(firebaseReady.value, userData.value) {
         if (firebaseReady.value && userData.value == null) {
-            viewModel.launchCredentialManager()
+            viewModel.launchCredentialManager(context)
         }
     }
 
