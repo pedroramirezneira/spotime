@@ -24,6 +24,9 @@ import com.mediaverse.spotime.data.HistoryDataStore
 import com.mediaverse.spotime.model.TrackData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -55,26 +58,42 @@ class UserViewModel
         init {
             fetchListenedTracks()
             viewModelScope.launch {
+                delay(0)
                 val current = auth.currentUser
                 _userData.emit(current)
                 _firebaseReady.emit(true)
             }
         }
 
+        private val _isLoadingTracks = MutableStateFlow(false)
+        val isLoadingTracks = _isLoadingTracks.asStateFlow()
+
         private fun fetchListenedTracks() {
             viewModelScope.launch {
                 historyDataStore.listenedTrackIds.collect { ids ->
+                    _isLoadingTracks.emit(true)
+
+                    val distinctIds = ids.distinct()
+
                     val tracks =
-                        ids.mapNotNull { id ->
-                            try {
-                                val response = spotifyApi.getTrackById(id)
-                                Log.d("xoaco", response.toString())
-                                if (response.isSuccessful) response.body() else null
-                            } catch (e: Exception) {
-                                null
-                            }
-                        }
-                    _historyTracks.emit(tracks)
+                        distinctIds
+                            .map { id ->
+                                async {
+                                    try {
+                                        val response = spotifyApi.getTrackById(id)
+                                        if (response.isSuccessful) response.body()?.let { id to it } else null
+                                    } catch (e: Exception) {
+                                        null
+                                    }
+                                }
+                            }.awaitAll()
+                            .filterNotNull()
+                            .toMap()
+
+                    val orderedTracks = ids.mapNotNull { tracks[it] }
+
+                    _historyTracks.emit(orderedTracks)
+                    _isLoadingTracks.emit(false)
                 }
             }
         }

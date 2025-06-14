@@ -3,6 +3,8 @@ package com.mediaverse.spotime.ui.screens.user
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -22,6 +24,7 @@ fun User() {
     val userData = viewModel.userData.collectAsStateWithLifecycle()
     val historyTracks = viewModel.historyTracks.collectAsStateWithLifecycle()
     val firebaseReady = viewModel.firebaseReady.collectAsStateWithLifecycle()
+    val isLoadingHistory = viewModel.isLoadingTracks.collectAsStateWithLifecycle()
 
     LaunchedEffect(firebaseReady.value, userData.value) {
         if (firebaseReady.value && userData.value == null) {
@@ -41,18 +44,19 @@ fun User() {
         return
     }
 
-    Column(
+    LazyColumn(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(vertical = ViewPadding)
+            .fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(ListPadding)
     ) {
-        Column(modifier = Modifier.padding(horizontal = ViewPadding)) {
+        item {
             AsyncImage(
                 model = userData.value?.photoUrl,
                 contentDescription = null,
                 modifier = Modifier.size(ImageSize)
             )
             Spacer(Modifier.height(RowGap))
+
             Text(
                 userData.value?.displayName ?: "",
                 style = MaterialTheme.typography.titleMedium
@@ -85,26 +89,41 @@ fun User() {
             }
 
             Spacer(modifier = Modifier.height(ColumnGap))
-
             Text(stringResource(R.string.tracks_history), style = MaterialTheme.typography.titleSmall)
             Spacer(modifier = Modifier.height(RowGap))
         }
-        if (historyTracks.value.isEmpty()) {
-            Text(
-                stringResource(R.string.empty_tracks_history),
-                style = MaterialTheme.typography.bodyMedium
-            )
-        } else {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(bottom = BottomBarHeight),
-                verticalArrangement = Arrangement.spacedBy(ListPadding)
-            ) {
-                historyTracks.value.forEachIndexed { index, track ->
+
+        when {
+            isLoadingHistory.value -> {
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillParentMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
+            }
+
+            historyTracks.value.isEmpty() -> {
+                item {
+                    Text(
+                        stringResource(R.string.empty_tracks_history),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            }
+
+            else -> {
+                itemsIndexed(historyTracks.value) { index, track ->
                     TrackRow(index = index, track = track, onClick = { /* Navigation */ })
                 }
             }
+        }
+
+        item {
+            Spacer(modifier = Modifier.height(BottomBarHeight))
         }
     }
 }
