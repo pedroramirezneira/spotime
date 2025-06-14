@@ -20,13 +20,12 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.mediaverse.spotime.api.SpotifyApi
 import com.mediaverse.spotime.authentication.Constants
-import com.mediaverse.spotime.data.HistoryDataStore
+import com.mediaverse.spotime.data.getListenedTrackIds
 import com.mediaverse.spotime.model.TrackData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -39,9 +38,8 @@ const val TAG = "UserViewModel"
 class UserViewModel
     @Inject
     constructor(
-        @ApplicationContext val context: Context,
+        @ApplicationContext private val context: Context,
         private val spotifyApi: SpotifyApi,
-        private val historyDataStore: HistoryDataStore,
     ) : ViewModel() {
         private val auth: FirebaseAuth = FirebaseAuth.getInstance()
         private val credentialManager = CredentialManager.create(context)
@@ -56,9 +54,7 @@ class UserViewModel
         val firebaseReady = _firebaseReady.asStateFlow()
 
         init {
-            fetchListenedTracks()
             viewModelScope.launch {
-                delay(0)
                 val current = auth.currentUser
                 _userData.emit(current)
                 _firebaseReady.emit(true)
@@ -68,9 +64,9 @@ class UserViewModel
         private val _isLoadingTracks = MutableStateFlow(false)
         val isLoadingTracks = _isLoadingTracks.asStateFlow()
 
-        private fun fetchListenedTracks() {
+        fun fetchListenedTracks() {
             viewModelScope.launch {
-                historyDataStore.listenedTrackIds.collect { ids ->
+                getListenedTrackIds(context).collect { ids ->
                     _isLoadingTracks.emit(true)
 
                     val distinctIds = ids.distinct()
@@ -82,7 +78,7 @@ class UserViewModel
                                     try {
                                         val response = spotifyApi.getTrackById(id)
                                         if (response.isSuccessful) response.body()?.let { id to it } else null
-                                    } catch (e: Exception) {
+                                    } catch (_: Exception) {
                                         null
                                     }
                                 }
@@ -188,8 +184,9 @@ class UserViewModel
 
         fun clearHistory() {
             viewModelScope.launch {
-                historyDataStore.clearHistory()
-                _historyTracks.emit(emptyList()) // Clear the UI as well
+                com.mediaverse.spotime.data
+                    .clearHistory(context)
+                _historyTracks.emit(emptyList())
             }
         }
     }

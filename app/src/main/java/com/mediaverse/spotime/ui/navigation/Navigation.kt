@@ -82,7 +82,7 @@ fun Navigation(
         }
 
         composable(Screens.User.route) {
-            User()
+            User(navController)
         }
     }
 }

@@ -26,8 +26,8 @@ class NotificationReceiver : BroadcastReceiver() {
         val notificationManager = context.getSystemService(NotificationManager::class.java)
 
         val notification = NotificationCompat.Builder(context, notificationChannelID)
-            .setContentTitle("Don't slack off now")
-            .setContentText("Remember to learn a little Android development today")
+            .setContentTitle(context.getString(R.string.app_name))
+            .setContentText(context.getString(R.string.notification))
             .setSmallIcon(R.drawable.isologo)
             .setPriority(NotificationManager.IMPORTANCE_HIGH)
             .setContentIntent(pendingIntent)

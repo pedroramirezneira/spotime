@@ -7,4 +7,5 @@
     <string name="clear_history">Clear history</string>
     <string name="empty_tracks_history">You have not listened to any songs yet. Head to the tracks section and listen to a song to view it here!</string>
     <string name="tracks_history">Listened tracks history</string>
+    <string name="notification">You have listened to a new song. Go check it out in your tracks history!</string>
 </resources>

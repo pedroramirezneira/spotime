@@ -8,7 +8,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -17,12 +16,14 @@ import androidx.compose.ui.res.stringResource
 import coil3.compose.AsyncImage
 import com.mediaverse.spotime.model.TrackData
 import androidx.core.net.toUri
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.mediaverse.spotime.authentication.Constants
 import com.mediaverse.spotime.ui.theme.BorderRadius
 import com.mediaverse.spotime.ui.theme.ColumnGap
 import com.mediaverse.spotime.ui.theme.ViewPadding
 import com.mediaverse.spotime.R
-import com.mediaverse.spotime.data.HistoryDataStore
+import com.mediaverse.spotime.data.addTrackId
+import com.mediaverse.spotime.notification.ScheduleNotificationViewModel
 import kotlinx.coroutines.launch
 
 @Composable
@@ -30,7 +31,7 @@ fun TrackDetailsScreen(track: TrackData) {
     val artistNames = track.artists.joinToString(", ") { it.name }
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val dataStore = remember { HistoryDataStore(context) }
+    val viewModel: ScheduleNotificationViewModel = hiltViewModel()
 
     Column(
         modifier = Modifier
@@ -59,7 +60,8 @@ fun TrackDetailsScreen(track: TrackData) {
         Button(
             onClick = {
                 scope.launch {
-                    dataStore.addTrackId(track.id)
+                    addTrackId(context, track.id)
+                    viewModel.scheduleNotification()
                     val spotifyUrl = "${Constants.TRACK_ENDPOINT}/${track.id}"
                     val intent = Intent(Intent.ACTION_VIEW, spotifyUrl.toUri())
                     context.startActivity(intent)
